@@ -4,16 +4,12 @@ import type { Client, Project, InboxTask, FocusTask } from '../types';
 import InboxWidget from './InboxWidget';
 
 interface DashboardViewProps {
-  clients: Client[];
-  projects: Project[];
   inboxTasks: InboxTask[];
   focusTasks: FocusTask[];
-  taskToPlan: InboxTask | null;
-  handlers: any; // Simplificado por brevedad, idealmente se tiparía cada handler
-  focusBreaks: number;
+  handlers: any;
 }
 
-const DashboardView: React.FC<DashboardViewProps> = ({ clients, projects, inboxTasks, focusTasks, taskToPlan, handlers, focusBreaks }) => {
+const DashboardView: React.FC<DashboardViewProps> = ({ inboxTasks, focusTasks, handlers }) => {
   const totalRevenueMonth = useMemo(() => {
     return focusTasks.filter(t => t.paid).reduce((sum, task) => sum + task.value, 0);
   }, [focusTasks]);

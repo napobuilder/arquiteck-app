@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, X, Play, Pause, Trash2, CheckCircle } from 'lucide-react';
+import { Plus, Play, Pause, Trash2, CheckCircle } from 'lucide-react';
 import type { InboxTask } from '../types';
 
 type FocusType = 'Billable' | 'Internal' | 'Personal' | null;
