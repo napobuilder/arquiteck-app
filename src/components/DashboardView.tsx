@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Calendar, ChevronDown, ArrowRight } from 'lucide-react';
-import type { Client, Project, InboxTask, FocusTask } from '../types';
+import type { InboxTask, FocusTask } from '../types';
 import InboxWidget from './InboxWidget';
 
 interface DashboardViewProps {

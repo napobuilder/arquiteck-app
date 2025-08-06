@@ -158,7 +158,7 @@ const App = () => {
             </div>
           </header>
           <main className="flex-1 p-8 overflow-y-auto bg-[#14171E]">
-            {activeView === 'dashboard' && <DashboardView clients={clients} projects={projects} inboxTasks={inboxTasks} focusTasks={focusTasks} taskToPlan={taskToPlan} handlers={handlers} focusBreaks={focusBreaks} />}
+            {activeView === 'dashboard' && <DashboardView inboxTasks={inboxTasks} focusTasks={focusTasks} handlers={handlers} />}
             {activeView === 'finances' && <FinancesView clients={clients} projects={projects} tasks={focusTasks} onUpdateTasks={handlers.setFocusTasks} onDeleteClient={handlers.handleDeleteClient} />}
             {activeView === 'foco' && <FocusPlanView taskToPlan={taskToPlan} onCommitTask={handlers.handleCommitToFocus} />}
           </main>
