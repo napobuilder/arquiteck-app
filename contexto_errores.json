@@ -1,0 +1,67 @@
+{
+  "resumen_app": {
+    "nombre": "Arquiteck",
+    "descripcion": "Una aplicación de productividad para arquitectos y profesionales creativos. Permite gestionar clientes, proyectos, tareas y sesiones de enfoque (pomodoros). Incluye un sistema de gamificación visual llamado 'Metrópolis', donde se construyen edificios a medida que se completan pomodoros.",
+    "stack_tecnologico": ["React", "TypeScript", "Vite", "Zustand", "Tailwind CSS"]
+  },
+  "problema_actual": {
+    "error": "Maximum update depth exceeded",
+    "descripcion": "La aplicación entra en un bucle de renderizado infinito, lo que provoca que se quede en blanco o se 'esconda'. El error se origina en la forma en que los componentes de React se suscriben a los cambios en el store de Zustand, lo que provoca actualizaciones de estado innecesarias y un bucle de renderizado.",
+    "componente_afectado": "DashboardView.tsx"
+  },
+  "historial_intentos": [
+    {
+      "paso": 1,
+      "accion": "Refactorización inicial a Zustand",
+      "resultado": "El error de bucle de renderizado infinito apareció por primera vez."
+    },
+    {
+      "paso": 2,
+      "accion": "Corrección de la importación de tipos",
+      "resultado": "El error persistió."
+    },
+    {
+      "paso": 3,
+      "accion": "Limpieza de la caché de Vite",
+      "resultado": "El error persistió."
+    },
+    {
+      "paso": 4,
+      "accion": "Modificación de la configuración de Vite para forzar la pre-optimización de dependencias",
+      "resultado": "El error persistió."
+    },
+    {
+      "paso": 5,
+      "accion": "Modificación de la configuración de TypeScript para ser menos estricta",
+      "resultado": "El error persistió."
+    },
+    {
+      "paso": 6,
+      "accion": "Refactorización del selector de Zustand en App.tsx para usar 'shallow'",
+      "resultado": "El error persistió."
+    },
+    {
+      "paso": 7,
+      "accion": "Refactorización del componente DashboardView para obtener los datos directamente del store de Zustand",
+      "resultado": "El error se aisló en el componente DashboardView."
+    },
+    {
+      "paso": 8,
+      "accion": "Refactorización del selector de Zustand en DashboardView para devolver solo las propiedades y acciones necesarias",
+      "resultado": "El error persiste, pero ahora sabemos que el problema está en cómo se seleccionan los datos en DashboardView."
+    }
+  ],
+  "estado_actual": {
+    "descripcion": "El problema del bucle de renderizado infinito persiste en el componente DashboardView. El siguiente paso es refactorizar el selector de Zustand en DashboardView para que devuelva solo las propiedades y acciones que se necesitan, en lugar de devolver objetos anidados.",
+    "archivos_modificados": [
+      "src/store/store.ts",
+      "src/App.tsx",
+      "src/pages/DashboardView.tsx",
+      "src/pages/ProjectsView.tsx",
+      "src/hooks/useTimer.ts",
+      "src/types/index.ts",
+      "vite.config.ts",
+      "tsconfig.app.json"
+    ]
+  }
+}

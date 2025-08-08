@@ -1,0 +1,204 @@
+¡Excelente! Con los archivos store.ts y los demás, ahora tengo la visión completa de la arquitectura de tu aplicación Arquiteck.
+
+He realizado un análisis detallado de tu store.ts. En general, tienes una base muy sólida y bien estructurada. El uso de persist es correcto y la forma en que divides el estado es lógica. Las recomendaciones que te daré a continuación son para refinar la lógica, mejorar la mantenibilidad y prevenir posibles errores sutiles a medida que la aplicación crezca.
+
+Diagnóstico y Recomendaciones para tu store.ts
+Aquí tienes los puntos clave que he identificado, ordenados por prioridad:
+
+1. Duplicación de Lógica en el Fin de Sesión
+Observación: La lógica para finalizar una sesión de Pomodoro está duplicada. El bloque else dentro de la función _tick es casi idéntico a toda la función _endSession. Ambas se encargan de incrementar los pomodoros de la tarea, guardarla como la última completada y abrir el modal de fin de sesión.
+
+Sugerencia: Unificar esta lógica en una sola función interna reduce la duplicación y asegura que el fin de una sesión (ya sea por tiempo o manualmente) se comporte siempre de la misma manera.
+
+Solución Propuesta:
+Crea una nueva acción interna y úsala en ambos lugares.
+
+TypeScript
+
+// Dentro de create<AppState>()(persist((set, get) => ({ ...
+
+// 1. Crea esta nueva acción interna
+_completePomodoroSession: () => {
+    const { activeTaskId, focusTasks, pomodoroDuration } = get();
+    const taskToEnd = focusTasks.find((task: FocusTask) => task.id === activeTaskId);
+
+    set(state => ({
+        lastCompletedTask: taskToEnd || null,
+        focusTasks: state.focusTasks.map((task: FocusTask) => 
+            task.id === activeTaskId ? { ...task, pomodoros: task.pomodoros + 1 } : task
+        ),
+        isTimerActive: false,
+        activeTaskId: null,
+        isEndModalOpen: true,
+        timer: pomodoroDuration, // Resetea el timer para la próxima sesión
+    }));
+},
+
+// 2. Modifica _tick para usar la nueva acción
+_tick: () => {
+    const { timer, isTimerActive, _completePomodoroSession } = get();
+    if (isTimerActive) {
+        if (timer > 1) { // Considera cambiar a > 0 si quieres que el timer llegue a 00:00
+            set({ timer: timer - 1 });
+        } else {
+            _completePomodoroSession(); // <-- Llama a la nueva acción
+        }
+    }
+},
+
+// 3. Modifica _endSession para que solo llame a la nueva acción
+_endSession: () => {
+    get()._completePomodoroSession(); // <-- Llama a la nueva acción
+},
+
+// ... resto de tu store
+2. IDs Basados en Date.now()
+Observación: Usas Date.now() para generar los IDs de nuevos clientes, proyectos y tareas del buzón.
+
+Problema: Aunque es poco probable, si dos elementos se crean en el mismo milisegundo, podrían tener el mismo ID, lo que causaría errores difíciles de depurar en React.
+
+Sugerencia: Utiliza un método más robusto para garantizar IDs únicos. La API crypto del navegador es perfecta para esto.
+
+Solución Propuesta:
+Reemplaza Date.now() por crypto.randomUUID().
+
+TypeScript
+
+// Ejemplo en addClient
+addClient: (name) => set(state => ({ 
+    clients: [...state.clients, { id: crypto.randomUUID(), name }] 
+})),
+
+// Ejemplo en addToInbox
+addToInbox: (name) => set(state => ({ 
+    inboxTasks: [...state.inboxTasks, {id: crypto.randomUUID(), name}] 
+})),
+
+// Aplica este cambio a addProject también.
+(Nota: crypto.randomUUID() es soportado por todos los navegadores modernos y es ideal para entornos de cliente).
+
+3. Acción commitToFocus con Demasiadas Responsabilidades
+Observación: La acción commitToFocus actualmente hace tres cosas: crea un cliente si no existe, crea un proyecto si no existe y finalmente crea la tarea de foco.
+
+Sugerencia: Esta acción se podría simplificar si la creación de clientes y proyectos se manejara en la interfaz (por ejemplo, en el componente ComboBox) antes de llamar a commitToFocus. Esto haría que tu store sea más predecible y fácil de probar. Por ahora, funciona, pero es un punto a considerar para futuras refactorizaciones.
+
+4. Lógica del Temporizador en _tick
+Observación: La condición del temporizador es if (timer > 1).
+
+Implicación: Esto significa que el último estado del temporizador que verá el usuario es 00:01. Inmediatamente después, la sesión terminará. Nunca se mostrará 00:00. Si este es el comportamiento deseado, está bien. Si prefieres que llegue a cero, puedes cambiar la condición a if (timer > 0).
+
+Análisis de Otros Archivos
+main.tsx y index.css: Tu configuración de Tailwind CSS es correcta. La línea import './index.css' en main.tsx asegura que las directivas @tailwind de index.css se apliquen globalmente, por lo que todas las clases de utilidad (como bg-[#101116], p-6, etc.) que usas en tus componentes funcionarán perfectamente.
+
+App.css y vite-env.d.ts: Son archivos estándar de la plantilla de Vite y no requieren ninguna acción.
+
+Resumen y Próximos Pasos
+Tu base de código es muy buena. Las recomendaciones se centran en hacerla más robusta y fácil de mantener.
+
+Acción Inmediata: Refactoriza la lógica de _tick y _endSession para eliminar la duplicación (Punto 1).
+
+Mejora de Robustez: Cambia la generación de IDs de Date.now() a crypto.randomUUID() (Punto 2).
+
+Revisión Menor: Considera si quieres que tu temporizador llegue a 00:00 y ajusta la lógica si es necesario (Punto 4).
+
+Has hecho un gran trabajo depurando y estructurando tu aplicación. Estos refinamientos la llevarán al siguiente nivel.
+
+Detuviste esta respuesta
+
+
+
+
+
+
+lo que no entiendo es porque no renderiza bien, a cada rato se qeda en blanca, pero se ve que quiere iniciar
+
+
+
+Mostrar razonamiento
+Entiendo perfectamente la frustración. La pantalla en blanco que ves es el síntoma final del bucle de renderizado infinito que hemos estado analizando. No es un error de inicio, sino la forma en que React se protege a sí mismo para no colapsar tu navegador.
+
+Piensa en ello como el motor de un coche que se sobrecalienta:
+
+Intento de Arrancar: React intenta renderizar tu componente DashboardView.
+
+Sobrecalentamiento: Durante ese renderizado, encuentra código que provoca otro renderizado inmediato (como un .filter o .sort en el JSX).
+
+Bucle: El nuevo renderizado vuelve a ejecutar el mismo código, que provoca otro renderizado, y así sucesivamente miles de veces en una fracción de segundo.
+
+Apagado de Emergencia: React detecta este bucle infinito, se da cuenta de que no puede terminar de renderizar y, para evitar que la página se congele, detiene todo el proceso. El resultado es una pantalla en blanco.
+
+Ese "parpadeo" o "intento de iniciar" que ves es el breve momento en que el bucle se está ejecutando antes de que React lo detenga.
+
+La Causa Exacta está en DashboardView.tsx
+Aunque hayas solucionado los problemas del store, la causa del bucle sigue activa en tu JSX. El problema está en que creas arrays nuevos en cada renderizado, específicamente aquí:
+
+Filtro de Proyectos en el ComboBox: Esta línea crea un nuevo array items cada vez que el componente se renderiza.
+
+JavaScript
+
+// PROBLEMA: Este .filter() se ejecuta en cada renderizado
+<ComboBox items={projects.filter((p) => p.clientId === ...)} ... />
+Ordenamiento de Tareas en la Lista: Esta línea crea un nuevo array ordenado cada vez que el componente se renderiza.
+
+JavaScript
+
+// PROBLEMA: Este .sort() se ejecuta en cada renderizado
+{focusTasks.sort((a, b) => { ... }).map((task) => { ... })}
+La Solución Definitiva: useMemo
+Para detener el bucle, debes "memorizar" el resultado de estos cálculos para que no se ejecuten en cada renderizado. Solo se volverán a calcular cuando los datos originales (projects o focusTasks) cambien.
+
+Aplica estas correcciones en tu archivo src/pages/DashboardView.tsx:
+
+1. Añade estos useMemo al inicio de tu componente DashboardView:
+
+TypeScript
+
+import React, { useState, useMemo, useCallback } from 'react'; // Asegúrate de importar useMemo
+// ... resto de importaciones y el componente
+
+const DashboardView = () => {
+    // ... tus hooks useStore y useState
+
+    // AÑADE ESTO:
+    const billableProjects = useMemo(() => {
+        const selectedClientId = clients.find(c => c.name === planningClient)?.id;
+        if (!selectedClientId) return [];
+        return projects.filter(p => p.clientId === selectedClientId);
+    }, [clients, projects, planningClient]);
+
+    const internalProjects = useMemo(() => {
+        return projects.filter(p => p.clientId === -1);
+    }, [projects]);
+
+    const sortedFocusTasks = useMemo(() => {
+        const priorityOrder = { high: 0, medium: 1, low: 2 };
+        return [...focusTasks].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+    }, [focusTasks]);
+
+    // ... resto de tu lógica de componente
+2. Usa estas nuevas variables en tu JSX:
+
+Ahora, reemplaza las operaciones directas en el JSX por estas constantes memoizadas.
+
+Para los ComboBox:
+
+JavaScript
+
+// Reemplaza esto:
+<ComboBox items={projects.filter(...)} ... />
+// Por esto:
+<ComboBox items={billableProjects} ... />
+
+// Reemplaza esto:
+<ComboBox items={projects.filter(...)} ... />
+// Por esto:
+<ComboBox items={internalProjects} ... />
+Para la lista de tareas:
+
+JavaScript
+
+// Reemplaza esto:
+{focusTasks.sort(...).map(...)}
+// Por esto:
+{sortedFocusTasks.map((task) => { ... })}
+Al hacer estos cambios, el bucle se detendrá y tu componente DashboardView se renderizará correctamente sin quedarse en blanco.

@@ -1,7 +1,19 @@
-import React from 'react';
 import { Play, Pause } from 'lucide-react';
+import { useTimerStore } from '../store/timerStore';
+import { useStore } from '../../../store/store';
 
-const GlobalTimerBar = ({ activeTask, timer, isTimerActive, onToggleTimer }: any) => {
+const GlobalTimerBar = () => {
+    const { activeTaskId, timer, isTimerActive, toggleTimer } = useTimerStore(state => ({
+        activeTaskId: state.activeTaskId,
+        timer: state.timer,
+        isTimerActive: state.isTimerActive,
+        toggleTimer: state.toggleTimer,
+    }));
+
+    const focusTasks = useStore(state => state.focusTasks);
+
+    const activeTask = focusTasks.find(t => t.id === activeTaskId);
+
     const formatTime = (seconds: number) => `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
 
     return (
@@ -14,7 +26,7 @@ const GlobalTimerBar = ({ activeTask, timer, isTimerActive, onToggleTimer }: any
                     </div>
                     <div className="flex items-center gap-6">
                         <p className="text-4xl font-bold text-white tracking-tighter">{formatTime(timer)}</p>
-                        <button onClick={() => onToggleTimer(activeTask.id)} className="bg-[#00ADB5] text-black p-3 rounded-full hover:bg-[#00c5cf]">
+                        <button onClick={() => toggleTimer(activeTask.id)} className="bg-[#00ADB5] text-black p-3 rounded-full hover:bg-[#00c5cf]">
                             {isTimerActive ? <Pause size={20} /> : <Play size={20} />}
                         </button>
                     </div>

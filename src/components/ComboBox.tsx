@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Plus } from 'lucide-react';
 
-const ComboBox = ({ items, value, onChange, onCreate, placeholder, disabled, className = '' }: any) => {
+const ComboBox = React.memo(({ items, value, onChange, onCreate, placeholder, disabled, className = '' }: any) => {
     const [query, setQuery] = useState('');
     const [isOpen, setIsOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -26,6 +26,6 @@ const ComboBox = ({ items, value, onChange, onCreate, placeholder, disabled, cla
             {isOpen && !disabled && (<div className="absolute z-10 w-full mt-1 bg-[#242933] border border-white/10 rounded-md shadow-lg"><ul className="py-1 max-h-40 overflow-y-auto">{filteredItems.map((item: any) => (<li key={item.id} onClick={() => handleSelect(item.name)} className="px-3 py-2 text-sm text-[#E0E3E8] hover:bg-[#00ADB5]/20 cursor-pointer">{item.name}</li>))}{showCreateOption && (<li onClick={handleCreate} className="px-3 py-2 text-sm text-[#00ADB5] hover:bg-[#00ADB5]/20 cursor-pointer flex items-center gap-2"><Plus size={16} /> Crear "{query}"</li>)}</ul></div>)}
         </div>
     );
-};
+});
 
 export default ComboBox;

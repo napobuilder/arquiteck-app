@@ -1,3 +1,4 @@
+
 export interface Client { 
     id: number; 
     name: string; 
@@ -42,4 +43,11 @@ export interface Building {
 export interface User { 
     name: string; 
     avatarLetter: string; 
+}
+
+export interface PomodoroNote{
+    id: number;
+    content: string;
+    timestamp: number;
+    taskName?: string;
 }

@@ -1,7 +1,11 @@
 import React, { useMemo } from 'react';
 import { Phone, Mail, WifiOff, Lightbulb, HelpCircle } from 'lucide-react';
+import { useStore } from '../store/store';
 
-const AnalysisView = ({ distractions }: { distractions: string[] }) => {
+const AnalysisView = () => {
+    const distractions = useStore(state => state.distractions);
+    const focusBreaks = useStore(state => state.focusBreaks);
+
     const distractionCounts = useMemo(() => {
         return distractions.reduce((acc, curr) => {
             acc[curr] = (acc[curr] || 0) + 1;

@@ -1,22 +1,28 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { X } from 'lucide-react';
+import { useTimerStore } from '../features/timer/store/timerStore';
+import { useStore } from '../store/store';
 
-const CustomTimeModal = ({ isOpen, onClose, onSave }: any) => {
+const CustomTimeModal = () => {
     const [minutes, setMinutes] = useState('45');
+    const setPomodoroDuration = useTimerStore(state => state.setPomodoroDuration);
+    const isCustomTimeModalOpen = useStore(state => state.isCustomTimeModalOpen);
+    const closeCustomTimeModal = useStore(state => state.closeCustomTimeModal);
 
-    if (!isOpen) return null;
+    if (!isCustomTimeModalOpen) return null;
 
     const handleSave = () => {
         const numMinutes = parseInt(minutes, 10);
         if (!isNaN(numMinutes) && numMinutes > 0) {
-            onSave(numMinutes);
+            setPomodoroDuration(numMinutes);
+            closeCustomTimeModal();
         }
     };
 
     return (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
             <div className="bg-[#14171E] rounded-2xl p-8 max-w-xs w-full border border-white/10 shadow-2xl relative">
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-white"><X size={20} /></button>
+                <button onClick={closeCustomTimeModal} className="absolute top-4 right-4 text-gray-500 hover:text-white"><X size={20} /></button>
                 <h2 className="text-xl font-bold text-white mb-6">Tiempo Personalizado</h2>
                 <div>
                     <label className="text-sm text-gray-400">Duración en minutos</label>

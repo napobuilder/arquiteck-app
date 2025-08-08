@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Inbox, Plus, Send, Trash2 } from 'lucide-react';
 import type { InboxTask } from '../types';
 
@@ -12,7 +12,21 @@ interface InboxWidgetProps {
 
 const InboxWidget: React.FC<InboxWidgetProps> = ({ inboxTasks, onAddTask, onPlanTask, onDeleteTask }) => {
   const [taskName, setTaskName] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
 
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkIsMobile);
+    };
+  }, []);
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!taskName.trim()) return;
@@ -21,6 +35,10 @@ const InboxWidget: React.FC<InboxWidgetProps> = ({ inboxTasks, onAddTask, onPlan
   };
   
   const handleDragStart = (e: React.DragEvent, task: InboxTask) => {
+    if (isMobile) {
+      e.preventDefault();
+      return;
+    }
     e.dataTransfer.setData('application/json', JSON.stringify(task));
   };
 
@@ -47,8 +65,8 @@ const InboxWidget: React.FC<InboxWidgetProps> = ({ inboxTasks, onAddTask, onPlan
           inboxTasks.map((task) => (
             <div 
               key={task.id} 
-              draggable 
-              onDragStart={(e) => handleDragStart(e, task)} 
+              draggable={!isMobile} 
+              onDragStart={!isMobile ? (e) => handleDragStart(e, task) : undefined} 
               className="bg-[#14171E] p-2.5 rounded-lg flex items-center justify-between cursor-grab active:cursor-grabbing"
             >
               <p className="text-sm text-[#E0E3E8]">{task.name}</p>

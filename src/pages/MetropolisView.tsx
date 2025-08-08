@@ -1,7 +1,9 @@
-import React from 'react';
+import { useStore } from '../store/store';
 import type { Building } from '../types';
 
-const MetropolisView = ({ cityData }: { cityData: Building[] }) => {
+const MetropolisView = () => {
+    const cityData = useStore(state => state.cityData);
+
     const BuildingComponent = ({ building }: { building: Building }) => {
         return (
             <div className={`w-full ${building.heightClass} ${building.colorClass} flex items-end`}>
