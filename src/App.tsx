@@ -25,7 +25,7 @@ import EditItemModal from './components/EditItemModal';
 import CustomTimeModal from './components/CustomTimeModal';
 import SettingsModal from './components/SettingsModal';
 import GlobalTimerBar from './features/timer/components/GlobalTimerBar';
-import { LogoMark, Wordmark } from './components/ArquiteckLogo';
+import * as ArquiteckLogo from './components/ArquiteckLogo';
 
 const App = () => {
     const location = useLocation();
@@ -176,8 +176,8 @@ const App = () => {
             <div className={`flex h-screen w-full bg-[#101116] font-sans text-[#E0E3E8] ${theme}`}>
                 <aside className="w-64 bg-[#101116] flex-col p-4 border-r border-white/5 hidden md:flex">
                     <div className="flex items-center gap-3 mb-10 p-2">
-                        <LogoMark size={40} accent="#00ADB5" />
-                        <Wordmark titleSize="text-xl" darkText={false} />
+                        <ArquiteckLogo.LogoMark size={40} accent="#00ADB5" />
+                        <ArquiteckLogo.Wordmark titleSize="text-xl" darkText={false} />
                     </div>
                     <nav className="flex-1">
                         <h2 className="px-2 text-xs font-semibold text-[#6C7581] uppercase tracking-wider mb-2">Menu</h2>
