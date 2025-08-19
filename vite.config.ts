@@ -7,10 +7,4 @@ export default defineConfig({
   optimizeDeps: {
     include: ['zustand', 'lucide-react', 'react', 'react-dom', 'react-router-dom']
   },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './src/setupTests.ts',
-    css: false,
-  },
 })

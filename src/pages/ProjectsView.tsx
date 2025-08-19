@@ -5,15 +5,13 @@ import { Plus, Edit2 } from 'lucide-react';
 import type { Client, Project } from '../types/index.ts';
 
 const ProjectsView = () => {
-    const { clients, projects, onCreateClient, onCreateProject, onUpdateProject, onStartEditClient, onStartEditProject } = useStore(state => ({ 
-        clients: state.clients,
-        projects: state.projects,
-        onCreateClient: state.addClient,
-        onCreateProject: state.addProject,
-        onUpdateProject: state.updateProject,
-        onStartEditClient: state.setEditingClient,
-        onStartEditProject: state.setEditingProject,
-    }), shallow);
+    const clients = useStore(state => state.clients);
+    const projects = useStore(state => state.projects);
+    const onCreateClient = useStore(state => state.addClient);
+    const onCreateProject = useStore(state => state.addProject);
+    const onUpdateProject = useStore(state => state.updateProject);
+    const onStartEditClient = useStore(state => state.setEditingClient);
+    const onStartEditProject = useStore(state => state.setEditingProject);
 
     const [newClientName, setNewClientName] = useState('');
     const [newProjectName, setNewProjectName] = useState('');

@@ -22,7 +22,7 @@ const CustomTimeModal = () => {
     return (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
             <div className="bg-[#14171E] rounded-2xl p-8 max-w-xs w-full border border-white/10 shadow-2xl relative">
-                <button onClick={closeCustomTimeModal} className="absolute top-4 right-4 text-gray-500 hover:text-white"><X size={20} /></button>
+                <button onClick={() => closeCustomTimeModal()} className="absolute top-4 right-4 text-gray-500 hover:text-white"><X size={20} /></button>
                 <h2 className="text-xl font-bold text-white mb-6">Tiempo Personalizado</h2>
                 <div>
                     <label className="text-sm text-gray-400">Duración en minutos</label>

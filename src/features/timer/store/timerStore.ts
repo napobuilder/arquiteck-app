@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { FocusTask, PomodoroNote } from '../../../types'; // Adjust path as needed
+import startFocusSound from '/sonidos-app/startfocus.ogg'; // Import the sound file
+import endPomodoroSound from '/sonidos-app/terminarpomodoro.ogg'; // Import the sound file
 
 interface TimerState {
     pomodoroDuration: number;
@@ -23,6 +25,7 @@ interface TimerState {
     setIsEndModalOpen: (isOpen: boolean) => void; // New action for clarity
     setActiveTaskId: (taskId: number | null) => void; // New action for clarity
     setTimer: (time: number) => void; // New action for clarity
+    resetTimerState: () => void; // Add this line
 }
 
 export const useTimerStore = create<TimerState>()(
@@ -39,10 +42,15 @@ export const useTimerStore = create<TimerState>()(
 
             toggleTimer: (taskId) => {
                 const { activeTaskId, pomodoroDuration } = get();
+                console.log('toggleTimer called. activeTaskId:', activeTaskId, 'taskId:', taskId); // Debug log
                 if (activeTaskId === taskId) {
+                    console.log('toggleTimer - Pausing timer. Setting isPauseModalOpen to true.'); // Debug log
                     set({ isTimerActive: false, isPauseModalOpen: true });
                 } else {
+                    console.log('toggleTimer - Starting timer. Setting isTimerActive to true.'); // Debug log
                     set({ activeTaskId: taskId, timer: pomodoroDuration, isTimerActive: true });
+                    const audio = new Audio(startFocusSound);
+                    audio.play().catch(e => console.error("Error playing sound:", e));
                 }
             },
 
@@ -55,9 +63,19 @@ export const useTimerStore = create<TimerState>()(
                     activeTaskId: null,
                     isEndModalOpen: true,
                 }));
+                const audio = new Audio(endPomodoroSound);
+                audio.play().catch(e => console.error("Error playing end pomodoro sound:", e));
             },
 
             closePauseModal: () => set({ isPauseModalOpen: false, isTimerActive: true }),
+
+            resetTimerState: () => set((state) => ({
+                timer: state.pomodoroDuration, // Reset to initial pomodoro duration
+                isTimerActive: false,
+                activeTaskId: null,
+                isPauseModalOpen: false,
+                isEndModalOpen: false,
+            })),
 
             closeEndModal: (note) => {
                 if (note) {
@@ -83,24 +101,20 @@ export const useTimerStore = create<TimerState>()(
         }),
         {
             name: 'arquiteck-timer-storage',
-            getStorage: () => localStorage,
-            partialize: (state) =>
+            storage: {
+                getItem: (name) => {
+                    const storedValue = localStorage.getItem(name);
+                    return storedValue ? JSON.parse(storedValue) : null;
+                },
+                setItem: (name, value) => {
+                    localStorage.setItem(name, JSON.stringify(value));
+                },
+                removeItem: (name) => localStorage.removeItem(name),
+            },
+                        partialize: (state) =>
                 Object.fromEntries(
-                    Object.entries(state).filter(([key]) =>
-                        ![
-                            'toggleTimer',
-                            'closePauseModal',
-                            'closeEndModal',
-                            'setPomodoroDuration',
-                            'setLastCompletedTask',
-                            'setIsTimerActive',
-                            'setIsPauseModalOpen',
-                            'setIsEndModalOpen',
-                            'setActiveTaskId',
-                            'setTimer',
-                        ].includes(key)
-                    )
-                ),
+                    Object.entries(state).filter(([, value]) => typeof value !== 'function')
+                ) as TimerState,
         }
     )
 );

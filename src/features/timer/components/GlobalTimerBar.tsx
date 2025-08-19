@@ -1,14 +1,13 @@
 import { Play, Pause } from 'lucide-react';
 import { useTimerStore } from '../store/timerStore';
 import { useStore } from '../../../store/store';
+import { shallow } from 'zustand/shallow';
 
 const GlobalTimerBar = () => {
-    const { activeTaskId, timer, isTimerActive, toggleTimer } = useTimerStore(state => ({
-        activeTaskId: state.activeTaskId,
-        timer: state.timer,
-        isTimerActive: state.isTimerActive,
-        toggleTimer: state.toggleTimer,
-    }));
+    const activeTaskId = useTimerStore(state => state.activeTaskId);
+    const timer = useTimerStore(state => state.timer);
+    const isTimerActive = useTimerStore(state => state.isTimerActive);
+    const toggleTimer = useTimerStore(state => state.toggleTimer);
 
     const focusTasks = useStore(state => state.focusTasks);
 

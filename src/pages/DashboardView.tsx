@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 
 import { useStore } from '../store/store';
 import { useTimerStore } from '../features/timer/store/timerStore';
@@ -48,6 +48,12 @@ const DashboardView = () => {
     const [isDropZoneActive, setIsDropZoneActive] = useState(false);
     const [dragOverContext, setDragOverContext] = useState<string | null>(null);
     
+    useEffect(() => {
+        if (taskToPlan) {
+            setPlanningName(taskToPlan.name);
+        }
+    }, [taskToPlan]);
+
     const selectedProjectForPlanning = useMemo(() => projects.find((p: Project) => p.name === planningProject), [projects, planningProject]);
 
     const billableProjects = useMemo(() => {
@@ -76,11 +82,15 @@ const DashboardView = () => {
         e.preventDefault();
         e.stopPropagation();
         const taskJSON = e.dataTransfer.getData('application/json');
+        console.log('handleDrop - taskJSON:', taskJSON); // Debug log
         if (taskJSON) {
             const task = JSON.parse(taskJSON);
+            console.log('handleDrop - parsed task:', task); // Debug log
             setTaskToPlan(task);
+            console.log('handleDrop - taskToPlan after set:', task); // Debug log (taskToPlan is async, so log task directly)
             if (context) {
                 setFocusType(context);
+                console.log('handleDrop - focusType set to:', context); // Debug log
             }
         }
         setIsDropZoneActive(false);

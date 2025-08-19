@@ -1,4 +1,4 @@
-import { shallow } from 'zustand/shallow';
+
 import {
     LayoutDashboard, Briefcase, BarChart, Building2, Settings, LogOut, Search, Bell, ChevronDown
 } from 'lucide-react';
@@ -25,96 +25,76 @@ import EditItemModal from './components/EditItemModal';
 import CustomTimeModal from './components/CustomTimeModal';
 import SettingsModal from './components/SettingsModal';
 import GlobalTimerBar from './features/timer/components/GlobalTimerBar';
+import { LogoMark, Wordmark } from './components/ArquiteckLogo';
 
 const App = () => {
     const location = useLocation();
     // --- ESTADO Y ACCIONES DESDE ZUSTAND ---
-    const {
-        clients, projects, inboxTasks, focusTasks, goals, distractions, cityData,
-        user, activeView, focusBreaks,
-        taskToPlan, taskToEdit, editingClient, editingProject, isCustomTimeModalOpen,
-        isSettingsModalOpen
-    } = useStore(state => ({
-        clients: state.clients,
-        projects: state.projects,
-        inboxTasks: state.inboxTasks,
-        focusTasks: state.focusTasks,
-        goals: state.goals,
-        distractions: state.distractions,
-        cityData: state.cityData,
-        user: state.user,
-        activeView: state.activeView,
-        focusBreaks: state.focusBreaks,
-        taskToPlan: state.taskToPlan,
-        taskToEdit: state.taskToEdit,
-        editingClient: state.editingClient,
-        editingProject: state.editingProject,
-        isCustomTimeModalOpen: state.isCustomTimeModalOpen,
-        isSettingsModalOpen: state.isSettingsModalOpen,
-    }), shallow);
+    const focusTasks = useStore(state => state.focusTasks);
+    const clients = useStore(state => state.clients);
+    const projects = useStore(state => state.projects);
+    const inboxTasks = useStore(state => state.inboxTasks);
+    const goals = useStore(state => state.goals);
+    const distractions = useStore(state => state.distractions);
+    const cityData = useStore(state => state.cityData);
+    const user = useStore(state => state.user);
+    const focusBreaks = useStore(state => state.focusBreaks);
+    const taskToPlan = useStore(state => state.taskToPlan);
+    const taskToEdit = useStore(state => state.taskToEdit);
+    const editingClient = useStore(state => state.editingClient);
+    const editingProject = useStore(state => state.editingProject);
+    const isCustomTimeModalOpen = useStore(state => state.isCustomTimeModalOpen);
+    const isSettingsModalOpen = useStore(state => state.isSettingsModalOpen);
+    const theme = useStore(state => state.theme); // New
 
-    const {
-        addClient, updateClient, addProject, updateProject, updateProjectDetails,
-        updateGoal, updateFocusTask, updateUser, commitToFocus,
-        incrementFocusBreaks, logDistraction, deleteTask, toggleComplete, addToInbox,
-        deleteFromInbox, setActiveView, setTaskToPlan, setTaskToEdit, setEditingClient,
-        setEditingProject, openCustomTimeModal, openSettingsModal,
-        closeCustomTimeModal, closeSettingsModal, updateFocusTaskPomodoros, incrementTotalPomodoros
-    } = useStore(state => ({
-        addClient: state.addClient,
-        updateClient: state.updateClient,
-        addProject: state.addProject,
-        updateProject: state.updateProject,
-        updateProjectDetails: state.updateProjectDetails,
-        updateGoal: state.updateGoal,
-        updateFocusTask: state.updateFocusTask,
-        updateUser: state.updateUser,
-        commitToFocus: state.commitToFocus,
-        incrementFocusBreaks: state.incrementFocusBreaks,
-        logDistraction: state.logDistraction,
-        deleteTask: state.deleteTask,
-        toggleComplete: state.toggleComplete,
-        addToInbox: state.addToInbox,
-        deleteFromInbox: state.deleteFromInbox,
-        setActiveView: state.setActiveView,
-        setTaskToPlan: state.setTaskToPlan,
-        setTaskToEdit: state.setTaskToEdit,
-        setEditingClient: state.setEditingClient,
-        setEditingProject: state.setEditingProject,
-        openCustomTimeModal: state.openCustomTimeModal,
-        openSettingsModal: state.openSettingsModal,
-        closeCustomTimeModal: state.closeCustomTimeModal,
-        closeSettingsModal: state.closeSettingsModal,
-        updateFocusTaskPomodoros: state.updateFocusTaskPomodoros,
-        incrementTotalPomodoros: state.incrementTotalPomodoros,
-    }), shallow);
+    const addClient = useStore(state => state.addClient);
+    const updateClient = useStore(state => state.updateClient);
+    const addProject = useStore(state => state.addProject);
+    const updateProject = useStore(state => state.updateProject);
+    const updateProjectDetails = useStore(state => state.updateProjectDetails);
+    const updateGoal = useStore(state => state.updateGoal);
+    const updateFocusTask = useStore(state => state.updateFocusTask);
+    const updateUser = useStore(state => state.updateUser);
+    const commitToFocus = useStore(state => state.commitToFocus);
+    const incrementFocusBreaks = useStore(state => state.incrementFocusBreaks);
+    const logDistraction = useStore(state => state.logDistraction);
+    const deleteTask = useStore(state => state.deleteTask);
+    const toggleComplete = useStore(state => state.toggleComplete);
+    const addToInbox = useStore(state => state.addToInbox);
+    const deleteFromInbox = useStore(state => state.deleteFromInbox);
+    const setActiveView = useStore(state => state.setActiveView);
+    const setTaskToPlan = useStore(state => state.setTaskToPlan);
+    const setTaskToEdit = useStore(state => state.setTaskToEdit);
+    const setEditingClient = useStore(state => state.setEditingClient);
+    const setEditingProject = useStore(state => state.setEditingProject);
+    const openCustomTimeModal = useStore(state => state.openCustomTimeModal);
+    const openSettingsModal = useStore(state => state.openSettingsModal);
+    const closeCustomTimeModal = useStore(state => state.closeCustomTimeModal);
+    const closeSettingsModal = useStore(state => state.closeSettingsModal);
+    const updateFocusTaskPomodoros = useStore(state => state.updateFocusTaskPomodoros);
+    const incrementTotalPomodoros = useStore(state => state.incrementTotalPomodoros);
 
-    const {
-        pomodoroDuration, activeTaskId, timer, isTimerActive, isPauseModalOpen, isEndModalOpen, lastCompletedTask,
-        pomodoroNotes, toggleTimer, closePauseModal, closeEndModal, setPomodoroDuration, setLastCompletedTask, setIsTimerActive, setIsPauseModalOpen, setIsEndModalOpen, setActiveTaskId, setTimer
-    } = useTimerStore(state => ({
-        pomodoroDuration: state.pomodoroDuration,
-        activeTaskId: state.activeTaskId,
-        timer: state.timer,
-        isTimerActive: state.isTimerActive,
-        isPauseModalOpen: state.isPauseModalOpen,
-        isEndModalOpen: state.isEndModalOpen,
-        lastCompletedTask: state.lastCompletedTask,
-        pomodoroNotes: state.pomodoroNotes,
-        toggleTimer: state.toggleTimer,
-        closePauseModal: state.closePauseModal,
-        closeEndModal: state.closeEndModal,
-        setPomodoroDuration: state.setPomodoroDuration,
-        setLastCompletedTask: state.setLastCompletedTask,
-        setIsTimerActive: state.setIsTimerActive,
-        setIsPauseModalOpen: state.setIsPauseModalOpen,
-        setIsEndModalOpen: state.setIsEndModalOpen,
-        setActiveTaskId: state.setActiveTaskId,
-        setTimer: state.setTimer,
-    }), shallow);
+    const pomodoroDuration = useTimerStore(state => state.pomodoroDuration);
+    const activeTaskId = useTimerStore(state => state.activeTaskId);
+    const timer = useTimerStore(state => state.timer);
+    const isTimerActive = useTimerStore(state => state.isTimerActive);
+    const isPauseModalOpen = useTimerStore(state => state.isPauseModalOpen);
+    const isEndModalOpen = useTimerStore(state => state.isEndModalOpen);
+    const lastCompletedTask = useTimerStore(state => state.lastCompletedTask);
+    const pomodoroNotes = useTimerStore(state => state.pomodoroNotes);
+    const toggleTimer = useTimerStore(state => state.toggleTimer);
+    const closePauseModal = useTimerStore(state => state.closePauseModal);
+    const closeEndModal = useTimerStore(state => state.closeEndModal);
+    const setPomodoroDuration = useTimerStore(state => state.setPomodoroDuration);
+    const setLastCompletedTask = useTimerStore(state => state.setLastCompletedTask);
+    const setIsTimerActive = useTimerStore(state => state.setIsTimerActive);
+    const setIsPauseModalOpen = useTimerStore(state => state.setIsPauseModalOpen);
+    const setIsEndModalOpen = useTimerStore(state => state.setIsEndModalOpen);
+    const setActiveTaskId = useTimerStore(state => state.setActiveTaskId);
+    const setTimer = useTimerStore(state => state.setTimer);
 
     // --- LÓGICA DEL TEMPORIZADOR ---
-    useTimer({ focusTasks, updateFocusTaskPomodoros, incrementTotalPomodoros });
+    useTimer();
 
     // --- DERIVED STATE ---
     const userAvatarUrl = `https://placehold.co/40x40/00ADB5/FFFFFF?text=${user.avatarLetter}`;
@@ -130,7 +110,6 @@ const App = () => {
         handleCommitToFocus: commitToFocus,
         handleCreateClient: addClient,
         handleCreateProject: addProject,
-        setActiveView,
         handleToggleTimer: toggleTimer,
         handleIncrementFocusBreaks: incrementFocusBreaks,
         handleLogDistraction: logDistraction,
@@ -150,7 +129,7 @@ const App = () => {
         handleUpdateGoal: updateGoal,
     };
 
-    const timerState = { activeTaskId, timer, pomodoroDuration, setPomodoroDuration };
+    
 
     const NavLink = ({ icon: Icon, label, to }: { icon: React.ElementType, label: string, to: string }) => (
         <li>
@@ -163,21 +142,8 @@ const App = () => {
 
     return (
         <>
-            <StrictPauseModal
-                isOpen={isPauseModalOpen}
-                onResume={() => setIsPauseModalOpen(false)}
-                onBreakFocus={() => {
-                    setIsPauseModalOpen(false);
-                    setIsTimerActive(false);
-                    incrementFocusBreaks();
-                }}
-                onLogDistraction={logDistraction}
-            />
-            <SessionEndModal
-                isOpen={isEndModalOpen}
-                taskName={lastCompletedTask?.name}
-                onSaveNote={(note: string) => closeEndModal(note)}
-            />
+            <StrictPauseModal />
+            <SessionEndModal />
             <EditTaskModal
                 isOpen={taskToEdit !== null}
                 onClose={() => setTaskToEdit(null)}
@@ -200,24 +166,18 @@ const App = () => {
                 title="Editar Proyecto"
                 fieldLabel="Nombre del Proyecto"
             />
-            <CustomTimeModal
-                isOpen={isCustomTimeModalOpen}
-                onClose={() => closeCustomTimeModal()}
-                onSave={(minutes: number) => setPomodoroDuration(minutes)}
-            />
+            <CustomTimeModal />
             <SettingsModal
                 isOpen={isSettingsModalOpen}
                 onClose={closeSettingsModal}
                 onSave={updateUser}
                 user={user}
             />
-            <div className="flex h-screen w-full bg-[#101116] font-sans text-[#E0E3E8]">
+            <div className={`flex h-screen w-full bg-[#101116] font-sans text-[#E0E3E8] ${theme}`}>
                 <aside className="w-64 bg-[#101116] flex-col p-4 border-r border-white/5 hidden md:flex">
                     <div className="flex items-center gap-3 mb-10 p-2">
-                        <div className="w-10 h-10 bg-[#00ADB5] rounded-lg flex items-center justify-center">
-                            <span className="text-xl font-bold text-white">A</span>
-                        </div>
-                        <h1 className="text-xl font-bold text-[#E0E3E8]">Arquiteck</h1>
+                        <LogoMark size={40} accent="#00ADB5" />
+                        <Wordmark titleSize="text-xl" darkText={false} />
                     </div>
                     <nav className="flex-1">
                         <h2 className="px-2 text-xs font-semibold text-[#6C7581] uppercase tracking-wider mb-2">Menu</h2>

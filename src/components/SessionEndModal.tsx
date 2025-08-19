@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { useTimerStore } from '../features/timer/store/timerStore';
+import { shallow } from 'zustand/shallow';
 
 const SessionEndModal = () => {
     const [note, setNote] = useState('');
-    const { isEndModalOpen, lastCompletedTask, closeEndModal } = useTimerStore(state => ({
-        isEndModalOpen: state.isEndModalOpen,
-        lastCompletedTask: state.lastCompletedTask,
-        closeEndModal: state.closeEndModal,
-    }));
+    const isEndModalOpen = useTimerStore(state => state.isEndModalOpen);
+    const lastCompletedTask = useTimerStore(state => state.lastCompletedTask);
+    const closeEndModal = useTimerStore(state => state.closeEndModal);
 
     if (!isEndModalOpen) return null;
 
