@@ -267,7 +267,7 @@ export const useStore = create<AppState>()(
 
                     const proximityThreshold = 15;
                     const isTooClose = cityData.some(b => 
-                        b.layer === nextLayer &&
+                        b && b.layer === nextLayer &&
                         potentialX < b.x + b.width + proximityThreshold &&
                         potentialX + potentialWidth + proximityThreshold > b.x
                     );

@@ -1,0 +1,102 @@
+Colocar el código del componente en el archivo correcto.
+
+Adaptar el componente para que lea y escriba en tu estado global de Zustand, en lugar de su propio estado local.
+
+Conectar la lógica para que se cree un edificio automáticamente cuando completes un Pomodoro.
+
+He preparado una guía paso a paso con los fragmentos de código exactos que necesitas.
+
+Paso 1: Instalar la Dependencia (Si aún no lo has hecho)
+Asegúrate de tener framer-motion en tu proyecto. Si no, abre tu terminal en la raíz del proyecto y ejecuta:
+
+Bash
+
+npm install framer-motion
+Paso 2: Actualizar MetropolisView.tsx
+Reemplaza todo el contenido de tu archivo existente en src/pages/MetropolisView.tsx con este nuevo código. Este código ya está adaptado para funcionar con tu arquitectura.
+MetropolisView.tsx (Integrado)
+16 ago, 11:42 p.m.
+
+Paso 3: Modificar tu Store de Zustand (store.ts)
+Ahora, necesitamos añadir la lógica para crear y almacenar los edificios en tu useStore. Abre src/store/store.ts y añade la acción addBuildingToCity que acabamos de usar.
+
+TypeScript
+
+// En src/store/store.ts, dentro de la definición de tu store...
+
+// ... (dentro de la interfaz de tu estado)
+export interface StoreState {
+  // ... tus otros estados
+  cityData: Building[]; // Asegúrate de que cityData esté aquí
+  addBuildingToCity: () => void; // La nueva acción
+}
+
+// ... (dentro de la implementación de tu store, junto a las otras acciones)
+set( (state) => ({
+  // ...
+  addBuildingToCity: () => {
+    const { cityData } = get(); // Obtiene el estado actual de la ciudad
+    const viewBoxWidth = 800; // Coincide con la config del SVG
+    const layerOrder: Building['layer'][] = ['back', 'mid', 'front'];
+    const nextLayer = layerOrder[cityData.length % layerOrder.length];
+
+    let newBuilding: Building | null = null;
+    const MAX_ATTEMPTS = 20;
+
+    for (let i = 0; i < MAX_ATTEMPTS; i++) {
+        const potentialWidth = Math.floor(Math.random() * 40) + 40;
+        const potentialHeight = Math.floor(Math.random() * 150) + 50;
+        const potentialX = Math.floor(Math.random() * (viewBoxWidth - potentialWidth));
+
+        const proximityThreshold = 15;
+        const isTooClose = cityData.some(b => 
+            b.layer === nextLayer &&
+            potentialX < b.x + b.width + proximityThreshold &&
+            potentialX + potentialWidth + proximityThreshold > b.x
+        );
+
+        if (!isTooClose) {
+            newBuilding = {
+                id: Date.now(),
+                width: potentialWidth,
+                height: potentialHeight,
+                x: potentialX,
+                layer: nextLayer,
+            };
+            break;
+        }
+    }
+    // ... (lógica de fallback si no encuentra espacio)
+
+    set({ cityData: [...cityData, newBuilding] });
+  },
+  // ...
+}))
+Paso 4: Disparar la Acción al Completar un Pomodoro
+El último paso es llamar a addBuildingToCity cuando un Pomodoro termina. El lugar perfecto para esto, según tu technical_snapshot.json, es en el hook useTimer o en el modal SessionEndModal.
+
+Vamos a hacerlo en el useTimer hook, que es donde se detecta que el tiempo ha llegado a cero.
+
+Abre src/features/timer/hooks/useTimer.ts y busca el lugar donde manejas el final del temporizador (probablemente dentro de un useEffect o setInterval). Ahí, simplemente necesitas llamar a la acción del store.
+
+TypeScript
+
+// En src/features/timer/hooks/useTimer.ts
+
+import { useStore } from '../../../store/store'; // Importa el store principal
+
+// ... dentro de tu hook useTimer
+
+useEffect(() => {
+  // ... tu lógica de intervalo
+  if (timer <= 0) {
+    // ... tu lógica existente para parar el timer, actualizar pomodoros, etc.
+    
+    // ¡AQUÍ ES LA MAGIA!
+    // Llama a la acción para añadir un nuevo edificio a la ciudad.
+    useStore.getState().addBuildingToCity();
+
+    // ... tu lógica para mostrar el SessionEndModal, etc.
+  }
+}, [timer, isTimerActive]);
+Con estos cambios, tu MetropolisView estará completamente integrada y se convertirá en una recompensa visual real por cada sesión de trabajo que completes.

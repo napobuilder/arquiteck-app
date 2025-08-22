@@ -1,0 +1,203 @@
+
+{
+  "application_overview": {
+    "appName": "Arquiteck",
+    "description": "A highly structured productivity application designed for deep work, combining task management, a Pomodoro timer, and gamified progress tracking. It is targeted at freelancers and professionals who need to manage projects, track billable time, and maintain focus.",
+    "technology_stack": {
+      "frontend": {
+        "framework": "React",
+        "language": "TypeScript",
+        "styling": "Tailwind CSS",
+        "state_management": "Zustand",
+        "routing": "React Router"
+      },
+      "backend": "None (Client-side with localStorage persistence)"
+    }
+  },
+  "file_structure": {
+    "src": {
+      "assets": ["react.svg"],
+      "components": [
+        "ArquiteckLogo.tsx",
+        "ComboBox.tsx",
+        "CustomTimeModal.tsx",
+        "EditItemModal.tsx",
+        "EditTaskModal.tsx",
+        "InboxWidget.tsx",
+        "SessionEndModal.tsx",
+        "SettingsModal.tsx",
+        "StrictPauseModal.tsx"
+      ],
+      "features": {
+        "timer": {
+          "components": [
+            "GlobalTimerBar.tsx",
+            "TimerDisplay.test.tsx",
+            "TimerDisplay.tsx"
+          ],
+          "hooks": ["useTimer.ts"],
+          "store": ["timerStore.ts"]
+        }
+      },
+      "hooks": [],
+      "pages": [
+        "AnalysisView.tsx",
+        "DashboardView.tsx",
+        "MetropolisView.tsx",
+        "NotesView.tsx",
+        "ProjectsView.tsx"
+      ],
+      "store": ["store.ts"],
+      "types": ["index.ts"],
+      "main.tsx": "Application entry point",
+      "App.tsx": "Main application component, layout, and routing",
+      "index.css": "Global styles",
+      "App.css": "Legacy global styles",
+      "setupTests.ts": "Test setup",
+      "vite-env.d.ts": "Vite environment types"
+    }
+  },
+  "data_model": {
+    "description": "The core data structures of the application, defined in src/types/index.ts.",
+    "types": {
+      "Client": "{ id: number; name: string; }",
+      "Project": "{ id: number; clientId: number; name: string; billingType: 'task' | 'retainer'; retainerValue: number; }",
+      "InboxTask": "{ id: number; name: string; }",
+      "FocusTask": "{ id: number; projectId: number; name: string; completed: boolean; pomodoros: number; value: number; paid: boolean; priority: 'low' | 'medium' | 'high'; completedAt: number | null; }",
+      "Goal": "{ id: 'income' | 'focus'; target: number; }",
+      "Building": "{ id: number; heightClass: string; colorClass: string; windowCount: number; }",
+      "User": "{ name: string; avatarLetter: string; }",
+      "PomodoroNote": "{ id: number; content: string; timestamp: number; taskName?: string; }"
+    }
+  },
+  "state_management": {
+    "description": "The application uses Zustand for state management, with two separate stores for better organization.",
+    "stores": {
+      "useStore": {
+        "file": "src/store/store.ts",
+        "description": "The main store for the application, handling core data like clients, projects, tasks, and user settings. It uses `persist` middleware to save the state to localStorage.",
+        "state": [
+          "clients", "projects", "inboxTasks", "focusTasks", "goals", "distractions", "cityData", "totalPomodoros", "user", "activeView", "focusBreaks",
+          "taskToPlan", "taskToEdit", "editingClient", "editingProject", "isCustomTimeModalOpen", "isSettingsModalOpen",
+          "shortBreakDuration", "longBreakDuration", "pomodorosUntilLongBreak", "isFocusSoundEnabled", "isPomodoroEndSoundEnabled", "soundVolume", "theme"
+        ],
+        "actions": [
+          "addClient", "updateClient", "addProject", "updateProject", "updateProjectDetails", "updateGoal", "updateFocusTask", "updateUser", "commitToFocus",
+          "updateFocusTaskPomodoros", "incrementTotalPomodoros", "incrementFocusBreaks", "logDistraction", "deleteTask", "toggleComplete", "addToInbox",
+          "deleteFromInbox", "setActiveView", "setTaskToPlan", "setTaskToEdit", "setEditingClient", "setEditingProject", "openCustomTimeModal",
+          "openSettingsModal", "closeCustomTimeModal", "closeSettingsModal", "setShortBreakDuration", "setLongBreakDuration", "setPomodorosUntilLongBreak",
+          "toggleFocusSound", "togglePomodoroEndSound", "setSoundVolume", "setTheme"
+        ]
+      },
+      "useTimerStore": {
+        "file": "src/features/timer/store/timerStore.ts",
+        "description": "A dedicated store for the Pomodoro timer's state. It also uses `persist` middleware.",
+        "state": [
+          "pomodoroDuration", "activeTaskId", "timer", "isTimerActive", "isPauseModalOpen", "isEndModalOpen", "lastCompletedTask", "pomodoroNotes"
+        ],
+        "actions": [
+          "toggleTimer", "closePauseModal", "closeEndModal", "setPomodoroDuration", "setLastCompletedTask", "setIsTimerActive", "setIsPauseModalOpen",
+          "setIsEndModalOpen", "setActiveTaskId", "setTimer", "resetTimerState"
+        ]
+      }
+    }
+  },
+  "component_hierarchy": {
+    "description": "The main component hierarchy of the application.",
+    "App": {
+      "children": [
+        "StrictPauseModal",
+        "SessionEndModal",
+        "EditTaskModal",
+        "EditItemModal",
+        "CustomTimeModal",
+        "SettingsModal",
+        "GlobalTimerBar",
+        {
+          "Routes": {
+            "children": [
+              "DashboardView",
+              "ProjectsView",
+              "AnalysisView",
+              "MetropolisView",
+              "NotesView"
+            ]
+          }
+        }
+      ]
+    },
+    "DashboardView": {
+      "children": [
+        "InboxWidget",
+        "ComboBox",
+        "TimerDisplay"
+      ]
+    },
+    "ProjectsView": {},
+    "AnalysisView": {},
+    "MetropolisView": {},
+    "NotesView": {}
+  },
+  "routing": {
+    "description": "The application uses React Router for navigation.",
+    "routes": {
+      "/dashboard": "DashboardView",
+      "/projects": "ProjectsView",
+      "/analysis": "AnalysisView",
+      "/metropolis": "MetropolisView",
+      "/notes": "NotesView",
+      "*": "DashboardView (Default)"
+    }
+  },
+  "key_logic_and_flows": {
+    "task_creation_and_planning": {
+      "description": "The flow for creating a task and planning it for a focus session.",
+      "steps": [
+        "User adds a task to the 'Inbox' via the `InboxWidget`.",
+        "The task is added to the `inboxTasks` array in the `useStore`.",
+        "User can drag the task from the inbox to the 'Plan de Foco' area or click the 'send' icon.",
+        "This sets the `taskToPlan` state in `useStore`.",
+        "The user then selects a context ('billable', 'internal', or 'personal').",
+        "Based on the context, the user might select a client and project.",
+        "Upon submission, the `commitToFocus` action is called, which creates a new `FocusTask` and removes the task from the inbox."
+      ]
+    },
+    "pomodoro_timer_session": {
+      "description": "The logic for starting, pausing, and ending a Pomodoro session.",
+      "steps": [
+        "User clicks the 'play' button on a `FocusTask` in the `DashboardView`.",
+        "The `toggleTimer` action in `useTimerStore` is called, setting the `activeTaskId` and `isTimerActive` to true.",
+        "The `useTimer` hook detects the change in `isTimerActive` and starts a `setInterval` countdown.",
+        "If the user clicks the 'pause' button, `toggleTimer` is called again, which sets `isTimerActive` to false and `isPauseModalOpen` to true, showing the `StrictPauseModal`.",
+        "In the `StrictPauseModal`, the user can either resume the timer or break the focus session.",
+        "If the timer completes, the `useTimer` hook updates the task's pomodoro count, shows the `SessionEndModal`, and resets the timer state."
+      ]
+    }
+  },
+  "potential_issues_and_recommendations": {
+    "state_management_complexity": {
+      "issue": "The `useStore` in `store.ts` is very large and manages a wide range of concerns, from core data to UI state. This can make it difficult to understand and maintain.",
+      "recommendation": "Consider splitting the `useStore` into smaller, more focused stores based on domain (e.g., a `useTaskStore`, `useProjectStore`, `useUIStateStore`). This would improve modularity and make the state easier to reason about."
+    },
+    "prop_drilling": {
+      "issue": "While Zustand helps with global state, there are still instances of prop drilling, especially with handlers in `App.tsx`. The `handlers` object is passed down to multiple components.",
+      "recommendation": "For components that are deeply nested, consider having them access the Zustand actions directly instead of receiving them as props. This can make the component hierarchy cleaner."
+    },
+    "lack_of_testing": {
+      "issue": "There is only one test file (`TimerDisplay.test.tsx`) and it's very basic. The core logic in the Zustand stores and hooks is not tested.",
+      "recommendation": "Add unit tests for the Zustand stores to ensure that the actions behave as expected. Also, add more comprehensive tests for the components, especially those with complex UI interactions like `DashboardView`."
+    },
+    "any_type_usage": {
+      "issue": "The code uses the `any` type in several places, such as in the props for `ComboBox`, `EditItemModal`, `EditTaskModal`, and `SettingsModal`. This undermines the benefits of TypeScript.",
+      "recommendation": "Define specific TypeScript interfaces for the props of these components to improve type safety and code clarity."
+    },
+    "hardcoded_strings": {
+      "issue": "There are several hardcoded strings for things like distraction reasons ('Llamada', 'Email Urgente', etc.) and UI text.",
+      "recommendation": "Move these strings to a separate constants file or an internationalization (i18n) library to make them easier to manage and translate."
+    },
+    "missing_error_handling": {
+      "issue": "There is limited error handling, especially for the audio playback and localStorage operations.",
+      "recommendation": "Add more robust error handling, such as `try...catch` blocks around localStorage access and better error reporting for audio playback issues."
+    }
+  }
+}

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useTimerStore } from '../store/timerStore';
 import { useStore } from '../../../store/store';
 import { CompletedPomodoro } from '../../../types'; // New import
-import endPomodoroSound from '/sonidos-app/terminarpomodoro.ogg'; // Import the sound file
+// import endPomodoroSound from '/sonidos-app/terminarpomodoro.ogg'; // Import the sound file
 
 // const FOCUS_SOUND_BEEP = "data:audio/wav;base64,UklGRl9vT1REP19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAAABAAAAAAAAAAA"; // A very short, low-volume beep
 // const POMODORO_END_SOUND_BEEP = "data:audio/wav;base64,UklGRl9vT1REP19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAAABAAAAAAAAAAA"; // A very short, low-volume beep
@@ -25,7 +25,7 @@ export const useTimer = () => {
         focusSoundRef.current.volume = soundVolume;
 
         if (!pomodoroEndSoundRef.current) { // New
-            pomodoroEndSoundRef.current = new Audio(endPomodoroSound);
+            pomodoroEndSoundRef.current = new Audio('/sonidos-app/terminarpomodoro.ogg');
         }
         pomodoroEndSoundRef.current.volume = soundVolume; // New
     }, [soundVolume]);
@@ -85,8 +85,12 @@ export const useTimer = () => {
                         console.log('useTimer - Timer reached 0. After setState - newState:', newState); // Debug log
                         return newState;
                     });
-                } // This closing brace was missing for the setInterval callback
-            }, 1000); // Assuming a 1-second interval, this was missing
+                    if (intervalRef.current) {
+                        clearInterval(intervalRef.current);
+                        intervalRef.current = null;
+                    }
+                }
+            }, 1000);
         } else {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);

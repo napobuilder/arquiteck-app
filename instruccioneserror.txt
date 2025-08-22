@@ -1,0 +1,79 @@
+El error que está deteniendo tu aplicación es este: Uncaught TypeError: Cannot read properties of null (reading 'layer'). Todo lo demás en el log es ruido o un problema secundario.
+
+Aquí está el análisis y la solución, directo al grano.
+
+Análisis del Error Principal (El que Causa el Cierre)
+El error es muy claro: estás intentando acceder a la propiedad layer de un objeto que es null o undefined.
+
+¿Dónde?: En el archivo MetropolisView.tsx, línea 90.
+
+¿Cuándo?: Dentro de una llamada a Array.filter().
+
+Esto significa que tienes un array (probablemente de proyectos o algún tipo de objeto visual) y uno o más de sus elementos son null. Cuando el .filter() itera sobre ese array, se encuentra con un elemento nulo e intenta hacer null.layer, lo que inevitablemente rompe la ejecución.
+
+Tu código en MetropolisView.tsx:90 probablemente se ve así:
+
+TypeScript
+
+// Algo similar a esto es lo que está causando el error
+algunArrayDeObjetos.filter(item => item.layer === 'algunaCondicion')
+Si item en alguna iteración es null, la expresión item.layer falla.
+
+Solución Principal
+Tienes dos formas de arreglar esto, una rápida y una más robusta.
+
+Solución Rápida (Añadir un "Guard Clause" o "Optional Chaining"): Modifica tu .filter() para que primero verifique si el objeto existe.
+
+Con Optional Chaining (Recomendado y moderno): Usa el operador ?. que simplemente evalúa a undefined si el objeto es null o undefined, sin lanzar un error.
+
+TypeScript
+
+// LÍNEA 90 MODIFICADA
+algunArrayDeObjetos.filter(item => item?.layer === 'algunaCondicion')
+Con una verificación explícita (Clásico):
+
+TypeScript
+
+// LÍNEA 90 MODIFICADA
+algunArrayDeObjetos.filter(item => item && item.layer === 'algunaCondicion')
+Solución Robusta (Limpiar los Datos en Origen): La mejor práctica es asegurarte de que tu array nunca contenga elementos nulos. Puedes filtrar los nulos antes de hacer la lógica principal.
+
+TypeScript
+
+// Antes de tu lógica de filtrado, limpia el array
+const objetosValidos = algunArrayDeObjetos.filter(Boolean); // Boolean como función elimina todos los valores "falsy" (null, undefined, 0, false, '')
+
+// Ahora puedes usar tu filter sin miedo
+objetosValidos.filter(item => item.layer === 'algunaCondicion');
+Análisis del Error Secundario (El Sonido)
+También veo este error, que no detiene la app pero es un bug:
+
+Error playing focus sound: NotSupportedError: The element has no supported sources.
+
+¿Dónde?: En el hook useTimer.ts, línea 37.
+
+¿Qué significa?: Estás intentando reproducir un sonido con un elemento <audio>, pero el navegador no puede encontrar o no es compatible con el archivo de audio que le pasaste en el src.
+
+Solución para el Sonido
+Verifica la Ruta del Archivo: Asegúrate de que la ruta al archivo de sonido (focus-sound.mp3, timer.wav, etc.) sea correcta. Si usas Vite, los archivos estáticos suelen ir en la carpeta public/ y se accede a ellos desde la raíz (/focus-sound.mp3).
+
+Verifica el Formato: Confirma que el formato del audio (MP3, WAV, OGG) sea compatible con los navegadores que usas. MP3 es casi universalmente seguro.
+
+Asegúrate de que el Elemento Audio se Carga: Revisa tu código en useTimer.ts para confirmar que el src del audio se está asignando correctamente antes de llamar a .play().
+
+Observación Adicional (Renders Excesivos)
+Noto una cantidad enorme de logs de StrictPauseModal - isPauseModalOpen. Esto indica que tu componente StrictPauseModal se está renderizando muchísimas veces, probablemente en cada cambio de estado, aunque no le afecte.
+
+Para optimizarlo, considera envolver tu componente StrictPauseModal con React.memo. Esto evitará que se vuelva a renderizar si sus props no han cambiado.
+
+TypeScript
+
+// En StrictPauseModal.tsx
+import React from 'react';
+
+const StrictPauseModal = (props) => {
+  // ... tu lógica
+};
+
+export default React.memo(StrictPauseModal); // ¡Envuelve aquí!
+Con estas correcciones, tu aplicación debería dejar de crashear, el sonido debería funcionar y, de paso, será un poco más eficiente. Si tienes otra duda, dispara.

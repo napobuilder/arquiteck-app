@@ -46,7 +46,7 @@ const SkylineBuilding: React.FC<SkylineBuildingProps> = ({ building }) => {
         transition={{ type: 'spring', stiffness: 80, damping: 15 }}
       rx="2"
       />
-      {showName && (
+      {showName && name && ( // Add name check here
         <> {/* Use a fragment to group rect and text */}
           <rect
             x={x + width / 2 - (name.length * 3)} // Adjust x based on text length for centering
@@ -87,7 +87,7 @@ const MetropolisView: React.FC<MetropolisViewProps> = ({ cityData }) => {
 
     const renderLayer = (layerName: BuildingType['layer']) => {
         return buildings
-            .filter(b => b.layer === layerName)
+            .filter(b => b && b.layer === layerName)
             .map(building => <SkylineBuilding key={building.id} building={building} />);
     };
 
